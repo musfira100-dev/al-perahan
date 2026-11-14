@@ -1,0 +1,412 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ BRAND_NAME }} | Men's suits, parda, clothing and bed sheets</title>
+<meta name="description" content="Men's suits stitched to size, parda made for your windows, clothing and bed sheets from Al Perahan Collection.">
+<meta name="theme-color" content="#026A6B">
+<link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16.png' %}">
+<link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+<link rel="manifest" href="{% static 'site.webmanifest' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,600;1,6..96,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/mark.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/extra.css' %}">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><path d="m4 16 12-12 4 4L8 20z"/><path d="m8 12 2 2M11 9l2 2M14 6l2 2"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5Z"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4 20l1.2-4.2A8 8 0 1 1 8.3 19L4 20Z"/><path d="M9 8.5c0 3 3 6 6 6l1.2-1.4-2-1-1 .7c-1-.4-2-1.4-2.4-2.4l.7-1-1-2L9 8.5Z"/></symbol>
+</svg>
+
+<!-- Logo splash: plays once per visit -->
+<div id="splash" aria-hidden="true">
+  <div class="splash-mark">
+    <div class="mark">
+      <img class="mark-teal" src="{% static 'img/logo-teal.png' %}" alt="" width="2240" height="1240">
+      {% for n in "1234" %}<img class="mark-gold g{{ n }}" src="{% static 'img/logo-gold.png' %}" alt="" width="2240" height="1240">{% endfor %}
+    </div>
+  </div>
+</div>
+
+<a class="skip" href="#shop">Skip to the shop</a>
+
+{% if sale %}
+<div class="salebar" id="salebar" role="note">
+  <span>Hurry up! {{ sale.title }}{% if sale.percent %} - up to {{ sale.percent }}% off{% endif %}<span id="sale-timer"></span></span>
+  <a href="#shop" data-cat="sale">Shop sale</a>
+</div>
+{% endif %}
+
+<div class="util">
+  <div class="wrap util-in">
+    <span>Call us: {{ BRAND_PHONE }}</span>
+    <span class="util-links">
+      <button type="button" data-open="track">Track order</button>
+      <button type="button" data-bespoke="Measurement visit">Book a measurement visit</button>
+      <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">WhatsApp</a>
+    </span>
+  </div>
+</div>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr-in">
+    <div class="hdr-left">
+      <button class="icon-btn menu-btn" type="button" data-open="menu" aria-label="Open menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+      <button class="txt-btn" type="button" id="btn-search"><svg class="ic"><use href="#i-search"/></svg><span>Search</span></button>
+    </div>
+    <a class="brand" href="#top" aria-label="{{ BRAND_NAME }} home">
+      <img src="{% static 'img/logo.png' %}" alt="Al Perahan Collection" width="2240" height="1240">
+    </a>
+    <div class="hdr-right">
+      <label class="visually-hidden" for="currency">Currency</label>
+      <select id="currency" class="currency">
+        <option value="PKR">PKR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="AED">AED</option>
+      </select>
+      <button class="txt-btn" type="button" data-open="wishlist"><svg class="ic"><use href="#i-heart"/></svg><span>Wishlist</span><b class="cnt" id="wish-badge">0</b></button>
+      <button class="txt-btn" type="button" data-open="bag"><svg class="ic"><use href="#i-bag"/></svg><span>Bag</span><b class="cnt" id="bag-badge">0</b></button>
+    </div>
+  </div>
+  <nav class="nav" aria-label="Main">
+    <div class="wrap nav-in">
+      <a class="nav-link" href="#shop" data-cat="all">New in</a>
+      {% for c in categories %}
+      <button class="nav-link" type="button" data-mega="{{ c.slug }}" aria-expanded="false" aria-controls="mega">{{ c.name }}<svg class="ic"><use href="#i-chev"/></svg></button>
+      {% endfor %}
+      {% if sale %}<a class="nav-link nav-sale" href="#shop" data-cat="sale">Sale</a>{% endif %}
+    </div>
+  </nav>
+  <div class="mega" id="mega" hidden>
+    <div class="wrap mega-in" id="mega-in"></div>
+  </div>
+</header>
+<div class="mega-dim" id="mega-dim" hidden></div>
+
+<main id="top">
+
+<!-- HERO banner (managed from Admin > Banners, placement "Home top slider") -->
+<section class="hero3" id="hero" aria-roledescription="carousel" aria-label="Featured">
+  <h1 class="visually-hidden">Al Perahan Collection</h1>
+  <div class="hero3-stage">
+    {% for s in hero_slides %}
+    <div class="hero3-slide{% if forloop.first %} is-active{% endif %}">
+      <img src="{{ s.image }}" {% if s.srcset %}srcset="{{ s.srcset }}" sizes="100vw"{% endif %} alt="" width="2400" height="1000" decoding="async" loading="eager" {% if forloop.first %}fetchpriority="high"{% endif %}>
+      <div class="hero3-shade"></div>
+      <div class="wrap hero3-copy">
+        {% if s.eyebrow %}<span class="eyebrow">{{ s.eyebrow }}</span>{% endif %}
+        <h2>{{ s.title }}</h2>
+        {% if s.text %}<p>{{ s.text }}</p>{% endif %}
+        <a class="btn btn-gold" href="#shop" data-cat="{{ s.slug }}">{{ s.label }} <svg class="ic"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="hero3-slide is-active empty-hero"><div class="wrap hero3-copy"><h2>Add a banner in the admin panel</h2><p>Admin &gt; Banners &gt; Add banner (placement: Home top slider).</p></div></div>
+    {% endfor %}
+    <button class="hero3-side hero3-prev" type="button" id="hero-prev" aria-label="Previous slide"><svg class="ic" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+    <button class="hero3-side hero3-next" type="button" id="hero-next" aria-label="Next slide"><svg class="ic"><use href="#i-arrow"/></svg></button>
+    <div class="hero3-ctrl wrap">
+      <div class="hero3-count" aria-hidden="true"><b id="hero-cur">01</b><span>/</span><span id="hero-total">01</span></div>
+      <div class="dots" id="hero-dots"></div>
+      <button class="round hero3-pause" type="button" id="hero-pause" aria-label="Pause slideshow"><i></i><i></i></button>
+    </div>
+    <div class="hero3-progress" aria-hidden="true"><i id="hero-bar"></i></div>
+  </div>
+  <div class="hero3-links">
+    <div class="wrap">{% for c in categories %}<a href="#shop" data-cat="{{ c.slug }}">{{ c.name }}</a>{% endfor %}</div>
+  </div>
+</section>
+
+<!-- SHOP BY CATEGORY -->
+<section class="section wrap" id="collections">
+  <header class="row-head"><h2>Shop by category</h2></header>
+  <div class="cat-tiles">
+    {% for c in categories %}
+    <a class="tile" href="#shop" data-cat="{{ c.slug }}">
+      <div class="media"><img src="{{ c.image }}" {% if c.srcset %}srcset="{{ c.srcset }}" sizes="(min-width:900px) 25vw, 50vw"{% endif %} alt="{{ c.name }}" width="900" height="1200" loading="lazy" decoding="async"></div>
+      <span class="tile-name">{{ c.name }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if sale %}
+<section class="saleband" aria-label="{{ sale.title }}">
+  <div class="wrap saleband-in">
+    <div>
+      <span class="eyebrow">Limited time</span>
+      <h2>{{ sale.title }}</h2>
+      <p>{% if sale.percent %}Up to {{ sale.percent }}% off{% else %}Special prices{% endif %} on selected pieces.</p>
+    </div>
+    <div class="saleband-timer" id="sale-band-timer" hidden></div>
+    <a class="btn btn-gold" href="#shop" data-cat="sale">Shop the sale <svg class="ic"><use href="#i-arrow"/></svg></a>
+  </div>
+</section>
+{% endif %}
+
+<!-- Product rows (built from the products you add in admin) -->
+<div id="rows"></div>
+
+{% if split_banners %}
+<section class="split">
+  {% for s in split_banners %}
+  <a class="split-item" href="#shop" data-cat="{{ s.slug }}">
+    <div class="media"><img src="{{ s.image }}" {% if s.srcset %}srcset="{{ s.srcset }}" sizes="50vw"{% endif %} alt="{{ s.title }}" width="1200" height="1200" loading="lazy" decoding="async"></div>
+    <div class="split-copy"><h3>{{ s.title }}</h3>{% if s.text %}<p>{{ s.text }}</p>{% endif %}<span class="btn btn-gold">{{ s.label }}</span></div>
+  </a>
+  {% endfor %}
+</section>
+{% endif %}
+
+<!-- SHOP ALL -->
+<section class="section wrap" id="shop">
+  <header class="sec-head sec-head-row">
+    <div><h2>Shop all</h2><p id="shop-count">Loading pieces...</p></div>
+    <div class="shop-tools">
+      <div class="search">
+        <svg class="ic"><use href="#i-search"/></svg>
+        <label class="visually-hidden" for="q">Search</label>
+        <input id="q" type="search" placeholder="Search suit, parda, cotton" autocomplete="off">
+      </div>
+      <label class="visually-hidden" for="sort">Sort</label>
+      <select id="sort"><option value="featured">Featured</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select>
+    </div>
+  </header>
+  <div class="chips" id="chips" role="tablist" aria-label="Categories"></div>
+  <div class="grid" id="grid" aria-live="polite"></div>
+  <div class="empty" id="empty" hidden>
+    <b>No pieces match that search</b>
+    <p>Try a different word, or clear the filters.</p>
+    <button class="btn btn-dark" type="button" id="reset">Clear filters</button>
+  </div>
+</section>
+
+<!-- SHOWROOM -->
+<section class="room" id="showroom">
+  <div class="wrap room-in">
+    <div class="room-media"><img id="room-img" alt="Showroom" loading="lazy" decoding="async" width="1400" height="1050"></div>
+    <div class="room-copy">
+      <h2>Visit the showroom</h2>
+      <div class="room-tabs" id="room-tabs"></div>
+      <h3 id="room-title"></h3>
+      <p id="room-desc"></p>
+      <dl>
+        <div><dt>Address</dt><dd id="room-addr"></dd></div>
+        <div><dt>Hours</dt><dd id="room-hours"></dd></div>
+        <div id="room-phone-row"><dt>Phone</dt><dd id="room-phone"></dd></div>
+      </dl>
+      <button class="btn btn-gold" type="button" data-bespoke="Showroom visit">Book a showroom visit <svg class="ic"><use href="#i-arrow"/></svg></button>
+    </div>
+  </div>
+</section>
+
+{% if testimonials %}
+<section class="reviews">
+  <div class="wrap">
+    <header class="sec-head"><h2>Words from our customers</h2></header>
+    <div class="rev-grid">
+      {% for t in testimonials %}
+      <figure class="rev"><blockquote>{{ t.quote }}</blockquote><figcaption><b>{{ t.name }}</b>{% if t.place %}<span>{{ t.place }}</span>{% endif %}</figcaption></figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <img src="{% static 'img/logo-light.png' %}" alt="Al Perahan Collection" width="2240" height="1240" loading="lazy">
+      <p>Men's suits, parda, clothing and bed sheets.</p>
+    </div>
+    <div><h4>Shop</h4><ul id="foot-cats"></ul></div>
+    <div><h4>Customer support</h4><ul>
+      <li><button type="button" data-bespoke="Measurement visit">Book a measurement visit</button></li>
+      <li><button type="button" data-open="track">Track my order</button></li>
+      <li><a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">WhatsApp us</a></li>
+    </ul></div>
+    <div><h4>Contact</h4><ul>
+      <li>{{ BRAND_PHONE }}</li>
+      <li><a href="mailto:{{ BRAND_EMAIL }}">{{ BRAND_EMAIL }}</a></li>
+    </ul></div>
+    <div class="foot-news"><h4>Sign up for our newsletter</h4>
+      <form id="news-form" class="news" novalidate>
+        <label class="visually-hidden" for="news-email">Email</label>
+        <input id="news-email" type="email" placeholder="Your email address" autocomplete="email" required>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+        <button class="btn btn-gold" type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+  <div class="wrap foot-base"><span>&copy; <span id="yr">2026</span> {{ BRAND_NAME }}. All rights reserved.</span><span>Tracked delivery</span></div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg class="ic"><use href="#i-wa"/></svg></a>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<!-- Mobile menu -->
+<aside class="drawer drawer-left" id="d-menu" hidden aria-label="Menu">
+  <div class="drawer-head"><img src="{% static 'img/logo.png' %}" alt="Al Perahan Collection" width="2240" height="1240"><button class="icon-btn" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <nav class="drawer-nav" id="menu-cats">
+    <a href="#shop" data-cat="all">New in</a>
+    {% for c in categories %}<a href="#shop" data-cat="{{ c.slug }}">{{ c.name }}</a>{% endfor %}
+    {% if sale %}<a href="#shop" data-cat="sale">Sale</a>{% endif %}
+    <a href="#showroom" data-close>Visit us</a>
+    <button type="button" data-open="track">Track order</button>
+  </nav>
+</aside>
+
+<!-- Bag -->
+<aside class="drawer" id="d-bag" hidden aria-label="Your bag">
+  <div class="drawer-head"><h3>Your bag</h3><button class="icon-btn" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <div class="drawer-body" id="bag-body"></div>
+  <div class="drawer-foot" id="bag-foot">
+    <div class="sum"><span>Estimated total</span><strong id="bag-total">PKR 0</strong></div>
+    <p class="note">We confirm sizes, price and delivery with you on WhatsApp before stitching.</p>
+    <button class="btn btn-dark btn-block" type="button" id="to-checkout">Checkout <svg class="ic"><use href="#i-arrow"/></svg></button>
+  </div>
+</aside>
+
+<!-- Wishlist -->
+<aside class="drawer" id="d-wishlist" hidden aria-label="Wishlist">
+  <div class="drawer-head"><h3>Wishlist</h3><button class="icon-btn" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <div class="drawer-body" id="wish-body"></div>
+</aside>
+
+<!-- Quick view -->
+<div class="modal" id="m-qv" hidden role="dialog" aria-modal="true" aria-labelledby="qv-title">
+  <div class="modal-box modal-wide">
+    <button class="icon-btn modal-x" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button>
+    <div class="qv">
+      <div class="qv-media media" id="qv-media"></div>
+      <div class="qv-info">
+        <span class="kicker" id="qv-cat"></span>
+        <h3 id="qv-title"></h3>
+        <p class="qv-price" id="qv-price"></p>
+        <p id="qv-desc" class="qv-desc"></p>
+        <dl class="specs">
+          <div><dt>Fabric</dt><dd id="qv-fabric"></dd></div>
+          <div><dt>Details</dt><dd id="qv-craft"></dd></div>
+          <div><dt>Ready in</dt><dd id="qv-delivery"></dd></div>
+        </dl>
+        <fieldset class="sizes"><legend>Size</legend><div id="qv-sizes"></div>
+          <button type="button" class="link" data-bespoke="Measurement visit">Need us to measure for you?</button></fieldset>
+        <div class="qv-actions">
+          <button class="btn btn-dark" type="button" id="qv-add">Add to bag</button>
+          <button class="round round-line" type="button" id="qv-wish" aria-label="Save to wishlist" aria-pressed="false"><svg class="ic"><use href="#i-heart"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout -->
+<div class="modal" id="m-checkout" hidden role="dialog" aria-modal="true" aria-labelledby="co-title">
+  <div class="modal-box">
+    <button class="icon-btn modal-x" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button>
+    <div id="co-form-wrap">
+      <h3 id="co-title">Delivery details</h3>
+      <p class="muted">We will confirm size, price and delivery on WhatsApp before anything is stitched.</p>
+      <form id="co-form" novalidate>
+        <div class="field"><label for="co-name">Full name</label><input id="co-name" name="name" autocomplete="name" required><small data-err="name"></small></div>
+        <div class="field-row">
+          <div class="field"><label for="co-phone">WhatsApp / phone</label><input id="co-phone" name="phone" inputmode="tel" autocomplete="tel" required><small data-err="phone"></small></div>
+          <div class="field"><label for="co-email">Email (optional)</label><input id="co-email" name="email" type="email" autocomplete="email"><small data-err="email"></small></div>
+        </div>
+        <div class="field"><label for="co-city">City</label><input id="co-city" name="city" autocomplete="address-level2" required><small data-err="city"></small></div>
+        <div class="field"><label for="co-address">Delivery address</label><textarea id="co-address" name="address" rows="2" autocomplete="street-address" required></textarea><small data-err="address"></small></div>
+        <div class="field"><label for="co-notes">Notes (optional)</label><textarea id="co-notes" name="notes" rows="2" placeholder="Window sizes, suit measurements, colour changes"></textarea></div>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+        <p class="form-err" id="co-err" role="alert" hidden></p>
+        <button class="btn btn-dark btn-block" type="submit" id="co-submit">Place order <span id="co-total"></span></button>
+      </form>
+    </div>
+    <div id="co-done" hidden class="done">
+      <span class="done-ic"><svg class="ic"><use href="#i-check"/></svg></span>
+      <h3>Order received</h3>
+      <p>Your order reference is</p>
+      <p class="ref" id="co-ref"></p>
+      <p class="muted">Send us the order on WhatsApp so we can confirm the details with you.</p>
+      <a class="btn btn-gold btn-block" id="co-wa" target="_blank" rel="noopener">Confirm on WhatsApp <svg class="ic"><use href="#i-wa"/></svg></a>
+      <button class="btn btn-line-dark btn-block" type="button" data-close>Continue shopping</button>
+    </div>
+  </div>
+</div>
+
+<!-- Track -->
+<div class="modal" id="m-track" hidden role="dialog" aria-modal="true" aria-labelledby="tr-title">
+  <div class="modal-box">
+    <button class="icon-btn modal-x" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button>
+    <h3 id="tr-title">Track your order</h3>
+    <p class="muted">Enter the reference we sent you, for example ALP-2026-1001.</p>
+    <form id="tr-form" class="inline-form" novalidate>
+      <label class="visually-hidden" for="tr-ref">Order reference</label>
+      <input id="tr-ref" placeholder="ALP-2026-1001" autocomplete="off" required>
+      <button class="btn btn-dark" type="submit">Find order</button>
+    </form>
+    <p class="form-err" id="tr-err" role="alert" hidden></p>
+    <div id="tr-result" hidden>
+      <div class="tr-head"><div><small>Order</small><b id="tr-r"></b></div><div><small>Placed</small><b id="tr-d"></b></div></div>
+      <ol class="steps" id="tr-steps"></ol>
+    </div>
+  </div>
+</div>
+
+<!-- Appointment -->
+<div class="modal" id="m-bespoke" hidden role="dialog" aria-modal="true" aria-labelledby="bs-title">
+  <div class="modal-box">
+    <button class="icon-btn modal-x" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button>
+    <div id="bs-form-wrap">
+      <h3 id="bs-title">Book a visit</h3>
+      <p class="muted">Tell us when suits you and we will confirm on WhatsApp.</p>
+      <form id="bs-form" novalidate>
+        <div class="field"><label for="bs-name">Full name</label><input id="bs-name" name="name" autocomplete="name" required><small data-err="name"></small></div>
+        <div class="field"><label for="bs-phone">WhatsApp / phone</label><input id="bs-phone" name="phone" inputmode="tel" autocomplete="tel" required><small data-err="phone"></small></div>
+        <div class="field-row">
+          <div class="field"><label for="bs-service">Type of visit</label>
+            <select id="bs-service" name="service">
+              <option>Measurement visit</option><option>Showroom visit</option><option>Suit fitting</option><option>Parda sizing at home</option>
+            </select></div>
+          <div class="field"><label for="bs-date">Preferred date</label><input id="bs-date" name="date" type="date"></div>
+        </div>
+        <div class="field"><label for="bs-notes">Notes (optional)</label><textarea id="bs-notes" name="notes" rows="2" placeholder="What you need, number of windows, event date"></textarea></div>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+        <p class="form-err" id="bs-err" role="alert" hidden></p>
+        <button class="btn btn-dark btn-block" type="submit" id="bs-submit">Request appointment</button>
+      </form>
+    </div>
+    <div id="bs-done" hidden class="done">
+      <span class="done-ic"><svg class="ic"><use href="#i-check"/></svg></span>
+      <h3>Request received</h3>
+      <p class="muted">Our team will message you on WhatsApp to confirm your appointment.</p>
+      <button class="btn btn-dark btn-block" type="button" data-close>Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+{{ shop_data|json_script:"shop-data" }}
+<script src="{% static 'js/app.js' %}" defer></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+from django.contrib import admin
+from django.utils.html import format_html
+
+from .models import (BespokeRequest, Category, HeroSlide, Order, OrderItem, Product,
+                     Sale, Showroom, Subscriber, Testimonial)
+
+
+def thumb(obj):
+    src = obj.image_src
+    if not src:
+        return "-"
+    return format_html('<img src="{}" style="height:56px;width:44px;object-fit:cover;border-radius:4px">', src)
+
+
+thumb.short_description = "Photo"
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = (thumb, "name", "order")
+    list_editable = ("order",)
+    prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = (thumb, "title", "category", "price_pkr", "sale_price", "tag", "is_featured", "is_active")
+    list_filter = ("category", "is_active", "is_featured")
+    list_editable = ("price_pkr", "sale_price", "tag", "is_featured", "is_active")
+    search_fields = ("title", "fabric", "craft", "description")
+    prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(Sale)
+class SaleAdmin(admin.ModelAdmin):
+    """Switch a sale ON or OFF with one tick. When it is OFF the site shows normal prices only."""
+    list_display = ("title", "percent_off", "is_active", "starts_at", "ends_at")
+    list_editable = ("is_active",)
+    filter_horizontal = ("categories",)
+    actions = ["switch_on", "switch_off"]
+
+    @admin.action(description="Switch selected sale ON")
+    def switch_on(self, request, qs):
+        qs.update(is_active=True)
+
+    @admin.action(description="Switch selected sale OFF")
+    def switch_off(self, request, qs):
+        qs.update(is_active=False)
+
+
+@admin.register(HeroSlide)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = (thumb, "title", "placement", "category", "order", "is_active")
+    list_editable = ("placement", "order", "is_active")
+    list_filter = ("placement", "is_active")
+
+
+@admin.register(Showroom)
+class ShowroomAdmin(admin.ModelAdmin):
+    list_display = ("city", "title", "address", "order", "is_active")
+    list_editable = ("order", "is_active")
+
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ("name", "place", "order", "is_active")
+    list_editable = ("order", "is_active")
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ("product", "title", "size", "quantity", "price_pkr")
+    can_delete = False
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ("reference", "name", "phone", "city", "total_pkr", "status", "created")
+    list_filter = ("status", "created")
+    list_editable = ("status",)
+    search_fields = ("reference", "name", "phone", "email")
+    readonly_fields = ("reference", "total_pkr", "created")
+    inlines = [OrderItemInline]
+    actions = ["mark_finishing", "mark_dispatched", "mark_delivered"]
+
+    @admin.action(description="Mark selected: In hand-finishing")
+    def mark_finishing(self, request, qs):
+        qs.update(status="finishing")
+
+    @admin.action(description="Mark selected: Dispatched")
+    def mark_dispatched(self, request, qs):
+        qs.update(status="dispatched")
+
+    @admin.action(description="Mark selected: Delivered")
+    def mark_delivered(self, request, qs):
+        qs.update(status="delivered")
+
+
+@admin.register(BespokeRequest)
+class BespokeRequestAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "service", "preferred_date", "handled", "created")
+    list_filter = ("handled", "service")
+    list_editable = ("handled",)
+    search_fields = ("name", "phone")
+
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ("email", "created")
+    search_fields = ("email",)
