@@ -34,3 +34,5 @@ python manage.py migrate
 python manage.py seed_shop
 python manage.py createsuperuser
 python manage.py runserver -->
+## Site settings (admin)
+Admin > Site settings: phone, WhatsApp, email, address, Google Maps link, opening hours and social links (Facebook, Instagram, TikTok, YouTube, X). Blank social links are hidden on the site. After pulling this update run `python manage.py migrate`.

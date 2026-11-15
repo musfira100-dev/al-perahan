@@ -1,8 +1,10 @@
 from django.contrib import admin
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import (BespokeRequest, Category, HeroSlide, Order, OrderItem, Product,
-                     Sale, Showroom, Subscriber, Testimonial)
+                     Sale, Showroom, SiteSettings, Subscriber, Testimonial)
 
 
 def thumb(obj):
@@ -109,3 +111,34 @@ class BespokeRequestAdmin(admin.ModelAdmin):
 class SubscriberAdmin(admin.ModelAdmin):
     list_display = ("email", "created")
     search_fields = ("email",)
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    """Contact details, location and social links. There is only one settings page."""
+    fieldsets = (
+        ("Brand and contact", {
+            "description": "Shown in the top bar, footer and WhatsApp buttons.",
+            "fields": ("brand_name", "phone", "whatsapp_number", "email"),
+        }),
+        ("Location", {
+            "description": "Shown in the footer. Paste the link from Google Maps > Share to get a map button.",
+            "fields": ("address", "maps_url", "hours"),
+        }),
+        ("Social links", {
+            "description": "Paste the full link (https://...). Leave blank to hide that icon.",
+            "fields": ("facebook_url", "instagram_url", "tiktok_url", "youtube_url", "twitter_url"),
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        obj = SiteSettings.get_solo()
+        if not obj.pk or not SiteSettings.objects.filter(pk=obj.pk).exists():
+            obj.save()
+        return redirect(reverse("admin:shop_sitesettings_change", args=[obj.pk]))

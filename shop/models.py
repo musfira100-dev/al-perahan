@@ -308,3 +308,71 @@ class Subscriber(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class SiteSettings(models.Model):
+    """One row only: contact details, location and social links, editable from the admin panel."""
+    brand_name = models.CharField("Brand name", max_length=80, blank=True)
+    phone = models.CharField("Phone number (shown on site)", max_length=40, blank=True)
+    whatsapp_number = models.CharField("WhatsApp number", max_length=20, blank=True)
+    email = models.EmailField("Email", blank=True)
+    address = models.CharField("Address / location", max_length=250, blank=True)
+    maps_url = models.URLField("Google Maps link", max_length=500, blank=True)
+    hours = models.CharField("Opening hours", max_length=120, blank=True)
+    facebook_url = models.URLField("Facebook link", blank=True)
+    instagram_url = models.URLField("Instagram link", blank=True)
+    tiktok_url = models.URLField("TikTok link", blank=True)
+    youtube_url = models.URLField("YouTube link", blank=True)
+    twitter_url = models.URLField("X (Twitter) link", blank=True)
+
+    class Meta:
+        verbose_name = "site settings"
+        verbose_name_plural = "site settings"
+
+    def __str__(self):
+        return "Site settings"
+
+    @staticmethod
+    def defaults():
+        from django.conf import settings
+        return {
+            "brand_name": settings.BRAND_NAME,
+            "phone": settings.BRAND_PHONE,
+            "whatsapp_number": settings.WHATSAPP_NUMBER,
+            "email": settings.BRAND_EMAIL,
+        }
+
+    @classmethod
+    def get_solo(cls):
+        """Return the single settings row, creating it from settings.py / .env values the first time."""
+        from django.db import DatabaseError
+        try:
+            obj, _ = cls.objects.get_or_create(pk=1, defaults=cls.defaults())
+            return obj
+        except DatabaseError:  # table not created yet (before migrate)
+            return cls(**cls.defaults())
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        digits = re.sub(r"\D", "", self.whatsapp_number or "")
+        if len(digits) == 11 and digits.startswith("0"):   # 0312xxxxxxx -> 92312xxxxxxx
+            digits = "92" + digits[1:]
+        self.whatsapp_number = digits
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass  # never delete the settings row
+
+    @property
+    def name(self):
+        return self.brand_name or self.defaults()["brand_name"]
+
+    @property
+    def phone_link(self):
+        return re.sub(r"[^\d+]", "", self.phone or "")
+
+    @property
+    def socials(self):
+        pairs = [("Facebook", self.facebook_url), ("Instagram", self.instagram_url),
+                 ("TikTok", self.tiktok_url), ("YouTube", self.youtube_url), ("X", self.twitter_url)]
+        return [(label, url) for label, url in pairs if url]

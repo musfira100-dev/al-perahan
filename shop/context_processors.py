@@ -1,10 +1,12 @@
-from django.conf import settings
+from .models import SiteSettings
 
 
 def brand(request):
+    site = SiteSettings.get_solo()
     return {
-        "BRAND_NAME": settings.BRAND_NAME,
-        "BRAND_PHONE": settings.BRAND_PHONE,
-        "BRAND_EMAIL": settings.BRAND_EMAIL,
-        "WHATSAPP_NUMBER": settings.WHATSAPP_NUMBER,
+        "SITE": site,
+        "BRAND_NAME": site.name,
+        "BRAND_PHONE": site.phone,
+        "BRAND_EMAIL": site.email,
+        "WHATSAPP_NUMBER": site.whatsapp_number,
     }

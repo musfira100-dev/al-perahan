@@ -59,11 +59,11 @@
 
 <div class="util">
   <div class="wrap util-in">
-    <span>Call us: {{ BRAND_PHONE }}</span>
+    <span>{% if SITE.phone %}Call us: <a href="tel:{{ SITE.phone_link }}">{{ SITE.phone }}</a>{% endif %}</span>
     <span class="util-links">
       <button type="button" data-open="track">Track order</button>
       <button type="button" data-bespoke="Measurement visit">Book a measurement visit</button>
-      <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">WhatsApp</a>
+      {% if WHATSAPP_NUMBER %}<a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
     </span>
   </div>
 </div>
@@ -242,11 +242,14 @@
     <div><h4>Customer support</h4><ul>
       <li><button type="button" data-bespoke="Measurement visit">Book a measurement visit</button></li>
       <li><button type="button" data-open="track">Track my order</button></li>
-      <li><a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">WhatsApp us</a></li>
+      {% if WHATSAPP_NUMBER %}<li><a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">WhatsApp us</a></li>{% endif %}
     </ul></div>
     <div><h4>Contact</h4><ul>
-      <li>{{ BRAND_PHONE }}</li>
-      <li><a href="mailto:{{ BRAND_EMAIL }}">{{ BRAND_EMAIL }}</a></li>
+      {% if SITE.phone %}<li><a href="tel:{{ SITE.phone_link }}">{{ SITE.phone }}</a></li>{% endif %}
+      {% if SITE.email %}<li><a href="mailto:{{ SITE.email }}">{{ SITE.email }}</a></li>{% endif %}
+      {% if SITE.address %}<li>{{ SITE.address }}{% if SITE.maps_url %} <a href="{{ SITE.maps_url }}" target="_blank" rel="noopener">(Open map)</a>{% endif %}</li>{% endif %}
+      {% if SITE.hours %}<li>{{ SITE.hours }}</li>{% endif %}
+      {% if SITE.socials %}<li class="foot-social">{% for label, url in SITE.socials %}<a href="{{ url }}" target="_blank" rel="noopener">{{ label }}</a>{% endfor %}</li>{% endif %}
     </ul></div>
     <div class="foot-news"><h4>Sign up for our newsletter</h4>
       <form id="news-form" class="news" novalidate>
@@ -260,7 +263,7 @@
   <div class="wrap foot-base"><span>&copy; <span id="yr">2026</span> {{ BRAND_NAME }}. All rights reserved.</span><span>Tracked delivery</span></div>
 </footer>
 
-<a class="wa-float" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg class="ic"><use href="#i-wa"/></svg></a>
+{% if WHATSAPP_NUMBER %}<a class="wa-float" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg class="ic"><use href="#i-wa"/></svg></a>{% endif %}
 
 <div class="scrim" id="scrim" hidden></div>
 

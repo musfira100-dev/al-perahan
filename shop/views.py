@@ -15,7 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from .models import (BespokeRequest, Category, HeroSlide, Order, OrderItem, Product,
-                     Sale, Showroom, Subscriber, Testimonial)
+                     Sale, Showroom, SiteSettings, Subscriber, Testimonial)
 
 PHONE_RE = re.compile(r"^[0-9+\-\s()]{7,20}$")
 
@@ -121,7 +121,7 @@ def home(request):
             "categories": cat_data,
             "showrooms": showrooms,
             "sale": sale_data,
-            "whatsapp": settings.WHATSAPP_NUMBER,
+            "whatsapp": SiteSettings.get_solo().whatsapp_number,
         },
     }
     return render(request, "shop/home.html", context)
@@ -194,13 +194,14 @@ def api_checkout(request):
         ])
 
     summary = "\n".join(f"- {p.title} ({s}) x{q}" for p, s, q in lines)
-    text = (f"Hello {settings.BRAND_NAME}, I placed order {order.reference}.\n{summary}\n"
+    site = SiteSettings.get_solo()
+    text = (f"Hello {site.name}, I placed order {order.reference}.\n{summary}\n"
             f"Total: PKR {order.total_pkr:,}\nName: {name}\nCity: {city}")
     return JsonResponse({
         "ok": True,
         "reference": order.reference,
         "total": order.total_pkr,
-        "whatsapp": f"https://wa.me/{settings.WHATSAPP_NUMBER}?text={quote(text)}",
+        "whatsapp": f"https://wa.me/{site.whatsapp_number}?text={quote(text)}",
     })
 
 

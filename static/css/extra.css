@@ -183,3 +183,6 @@
 .foot-news .news{margin-top:4px}
 .drawer-nav a{display:block}
 .qv-was{color:var(--muted);font-size:.95rem;font-weight:400;margin-right:8px}
+
+.foot-social{display:flex;flex-wrap:wrap;gap:6px 16px}
+.util-in a[href^="tel:"]{color:inherit}
