@@ -15,7 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from .models import (BespokeRequest, Category, HeroSlide, Order, OrderItem, Product,
-                     Sale, Showroom, SiteSettings, Subscriber, Testimonial)
+                     Sale, Showroom, SiteSettings, Subscriber, Testimonial, make_srcset)
 
 PHONE_RE = re.compile(r"^[0-9+\-\s()]{7,20}$")
 
@@ -53,16 +53,20 @@ def clean(value, limit):
 @ensure_csrf_cookie
 def home(request):
     sale = Sale.live()
-    products = list(Product.objects.filter(is_active=True).select_related("category"))
+    products = list(Product.objects.filter(is_active=True).select_related("category", "category__parent"))
     product_data = []
     for p in products:
         price = p.price_for(sale)
         was = p.price_pkr if price < p.price_pkr else 0
+        c = p.category
+        top = c.parent if c.parent_id else c
         product_data.append({
             "id": p.id,
             "title": p.title,
-            "category": p.category.name,
-            "categorySlug": p.category.slug,
+            "category": top.name,
+            "sub": c.name if c.parent_id else "",
+            "categorySlug": c.slug,
+            "catSlugs": [c.slug] + ([top.slug] if c.parent_id else []),
             "tag": p.tag,
             "price": price,
             "was": was,
@@ -76,13 +80,22 @@ def home(request):
             "srcset": p.srcset,
             "featured": p.is_featured,
         })
-    cat_data = []
-    for c in Category.objects.all():
-        live = [p for p in product_data if p["categorySlug"] == c.slug]
-        cat_data.append({
-            "id": c.id, "name": c.name, "slug": c.slug, "blurb": c.blurb, "image": c.image_src, "srcset": c.srcset,
+    def cat_payload(c):
+        live = [p for p in product_data if c.slug in p["catSlugs"]]
+        src = c.image_src
+        return {
+            "id": c.id, "name": c.name, "slug": c.slug, "blurb": c.blurb, "image": src, "srcset": make_srcset(src),
             "count": len(live), "start": min((p["price"] for p in live), default=0),
-        })
+        }
+
+    all_cats = list(Category.objects.select_related("parent"))
+    cat_data = []
+    for c in all_cats:
+        if c.parent_id:
+            continue
+        item = cat_payload(c)
+        item["children"] = [cat_payload(k) for k in all_cats if k.parent_id == c.id]
+        cat_data.append(item)
     showrooms = [
         {"city": s.city, "title": s.title, "desc": s.description, "address": s.address,
          "hours": s.hours, "phone": s.phone, "image": s.image_src, "srcset": s.srcset}
@@ -173,7 +186,7 @@ def api_checkout(request):
         qty = max(1, min(qty, 10))
         wanted[(pid, size)] = wanted.get((pid, size), 0) + qty
 
-    products = {p.id: p for p in Product.objects.filter(id__in={k[0] for k in wanted}, is_active=True)}
+    products = {p.id: p for p in Product.objects.filter(id__in={k[0] for k in wanted}, is_active=True).select_related("category")}
     lines = []
     for (pid, size), qty in wanted.items():
         prod = products.get(pid)

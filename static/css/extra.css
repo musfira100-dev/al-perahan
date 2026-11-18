@@ -83,7 +83,8 @@
 .hero3-stage{position:relative;height:clamp(440px,64vh,660px);overflow:hidden}
 .hero3-slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 1s ease,visibility 1s}
 .hero3-slide.is-active{opacity:1;visibility:visible}
-.hero3-slide>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:right center;transform:scale(1.07)}
+.hero3-slide{background:var(--teal-dd)}
+.hero3-slide>img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center center;transform:scale(1.03);image-rendering:auto}
 .hero3-slide.is-active>img{animation:kb 9s ease-out forwards}
 .hero3-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(1,47,48,.92) 0%,rgba(1,47,48,.7) 34%,rgba(1,47,48,.1) 62%,transparent 100%)}
 .hero3-copy{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:16px;color:var(--cream)}
@@ -119,7 +120,7 @@
 .hero3-links .wrap{display:flex;justify-content:center;flex-wrap:wrap;gap:6px clamp(18px,4vw,56px);padding-top:14px;padding-bottom:14px}
 .hero3-links a{font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;padding:4px 0;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
 .hero3-links a:hover{color:var(--teal);border-color:var(--gold)}
-@media(max-width:759px){.hero3-shade{background:linear-gradient(0deg,rgba(1,47,48,.92) 0%,rgba(1,47,48,.55) 55%,rgba(1,47,48,.15) 100%)}.hero3-copy{justify-content:flex-end;padding-bottom:78px}.hero3-slide>img{object-position:70% center}}
+@media(max-width:759px){.hero3-shade{background:linear-gradient(0deg,rgba(1,47,48,.92) 0%,rgba(1,47,48,.55) 55%,rgba(1,47,48,.15) 100%)}.hero3-copy{justify-content:flex-end;padding-bottom:78px}.hero3-slide>img{object-position:center center}}
 
 /* ---------- category tiles ---------- */
 .row-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:22px}
@@ -186,3 +187,50 @@
 
 .foot-social{display:flex;flex-wrap:wrap;gap:6px 16px}
 .util-in a[href^="tel:"]{color:inherit}
+
+
+/* ---------- top bar: email + social icons ---------- */
+.util-contact{display:flex;flex-wrap:wrap;gap:2px 18px}
+.util-contact a{opacity:.9}
+.util-contact a:hover{color:var(--gold)}
+@media(max-width:759px){.util-mail{display:none}}
+.util-links .util-social{display:inline-grid;place-items:center}
+.util-social .ic{width:16px;height:16px}
+
+/* ---------- footer social icons ---------- */
+.foot-social{gap:10px}
+.foot-social a{display:inline-grid;place-items:center;width:38px;height:38px;border:1px solid rgba(250,246,238,.35);border-radius:50%;transition:background .25s,color .25s,border-color .25s,transform .25s var(--ease)}
+.foot-social a:hover{background:var(--gold);border-color:var(--gold);color:var(--ink);transform:translateY(-3px)}
+.foot-social .ic{width:18px;height:18px}
+
+/* ---------- bag / wishlist: big product pictures ---------- */
+.drawer{width:min(520px,100%)}
+.line-item{grid-template-columns:clamp(112px,32vw,160px) 1fr;gap:18px;padding:18px 0}
+.line-item .media{aspect-ratio:3/4;border-radius:var(--r);cursor:pointer;box-shadow:0 8px 22px -14px rgba(1,47,48,.55)}
+.line-item h4{font-size:1.02rem}
+.line-item .price{font-size:1.05rem}
+
+/* ---------- sub-category chips + mega menu sub-links ---------- */
+.chips-sub{margin-top:-14px;padding-top:2px}
+.chips-sub .chip{padding:7px 14px;font-size:.82rem;border-radius:999px;background:var(--cream)}
+.chips-sub .chip.is-active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.mega-mid{min-width:0}
+.mega-subs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.mega-subs span{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.mega-subs a{display:inline-flex;align-items:baseline;gap:7px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:var(--white);text-decoration:none;font-size:.88rem;font-weight:500;transition:background .2s,color .2s,border-color .2s}
+.mega-subs a small{color:var(--muted);font-size:.74rem}
+.mega-subs a:hover{background:var(--teal);border-color:var(--teal);color:#fff}
+.mega-subs a:hover small{color:rgba(255,255,255,.8)}
+.drawer-nav .sub-link{font-family:var(--sans);font-size:1.02rem;padding:10px 0 10px 22px;color:var(--muted);position:relative}
+.drawer-nav .sub-link::before{content:"";position:absolute;left:4px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:2px;background:var(--gold)}
+
+/* ---------- WhatsApp button: round, blinking ---------- */
+.wa-float{position:fixed;right:18px;bottom:18px;z-index:55;width:62px;height:62px;border-radius:50%;background:#25d366;color:#fff;display:grid;place-items:center;box-shadow:0 10px 26px -8px rgba(0,0,0,.5);transition:transform .25s var(--ease);animation:wa-blink 1.5s ease-in-out infinite}
+.wa-float:hover{transform:scale(1.1);animation-play-state:paused}
+.wa-float .ic{width:34px;height:34px;position:relative;z-index:1;stroke:none}
+.wa-ring{position:absolute;inset:0;border-radius:50%;background:#25d366;z-index:0;animation:wa-ring 1.8s cubic-bezier(.2,.7,.3,1) infinite}
+.wa-float::after{content:"";position:absolute;inset:0;border-radius:50%;background:#25d366;z-index:0;animation:wa-ring 1.8s cubic-bezier(.2,.7,.3,1) .9s infinite}
+@keyframes wa-ring{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
+@keyframes wa-blink{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.22);transform:scale(1.08)}}
+@media(max-width:600px){.wa-float{right:14px;bottom:14px;width:56px;height:56px}.wa-float .ic{width:30px;height:30px}}
+@media(prefers-reduced-motion:reduce){.wa-float,.wa-ring,.wa-float::after{animation:none}}

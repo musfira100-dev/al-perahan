@@ -59,8 +59,13 @@ class ImageSourceMixin:
 
 
 class Category(ImageSourceMixin, models.Model):
+    """A shop category. Give it a 'parent' to make it a sub-category (e.g. Men's Suits > Summer)."""
     name = models.CharField(max_length=80)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True, help_text="Leave empty - it is made from the name automatically.")
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT, related_name="children",
+        limit_choices_to={"parent__isnull": True},
+        help_text="Leave empty for a main menu category. Choose e.g. Men's Suits to make this a sub-category (Summer, Winter...).")
     blurb = models.CharField(max_length=220, blank=True)
     image = models.ImageField(upload_to="categories/", blank=True)
     image_url = models.URLField(blank=True, help_text="Optional: use a web image instead of an upload.")
@@ -71,11 +76,34 @@ class Category(ImageSourceMixin, models.Model):
         verbose_name_plural = "categories"
 
     def __str__(self):
-        return self.name
+        return f"{self.parent.name} > {self.name}" if self.parent_id else self.name
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.parent_id:
+            if self.pk and self.parent_id == self.pk:
+                raise ValidationError({"parent": "A category cannot be its own parent."})
+            if self.parent.parent_id:
+                raise ValidationError({"parent": "Only one level of sub-categories is supported."})
+            if self.pk and self.children.exists():
+                raise ValidationError({"parent": "This category has sub-categories of its own, so it cannot become a sub-category."})
+
+    @property
+    def image_src(self):
+        if self.image:
+            return self.image.url
+        if self.image_url:
+            return self.image_url
+        return self.parent.image_src if self.parent_id else ""
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base = slugify(f"{self.parent.name} {self.name}" if self.parent_id else self.name)[:70] or "category"
+            slug, n = base, 2
+            while Category.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{n}"
+                n += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
 
@@ -102,7 +130,10 @@ class Sale(models.Model):
         return {c.id for c in self.categories.all()}
 
     def applies_to(self, product):
-        return not self.category_ids or product.category_id in self.category_ids
+        if not self.category_ids:
+            return True
+        cat = product.category
+        return cat.id in self.category_ids or (cat.parent_id is not None and cat.parent_id in self.category_ids)
 
     @classmethod
     def live(cls):
@@ -114,7 +145,24 @@ class Sale(models.Model):
         return None
 
 
+SIZE_PRESETS = {
+    "letters": "S,M,L,XL,XXL",
+    "numbers": "38,40,42,44,46",
+    "both": "S,M,L,XL,XXL,38,40,42,44,46",
+    "bedding": "Single,Double,King",
+    "free": "One size",
+}
+
+
 class Product(ImageSourceMixin, models.Model):
+    SIZE_PRESET_CHOICES = [
+        ("custom", "Custom - type my own sizes below"),
+        ("letters", "Letters: S, M, L, XL, XXL"),
+        ("numbers", "Numbers: 38, 40, 42, 44, 46"),
+        ("both", "Letters and numbers: S-XXL + 38-46"),
+        ("bedding", "Bedding: Single, Double, King"),
+        ("free", "One size"),
+    ]
     title = models.CharField(max_length=140)
     slug = models.SlugField(unique=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
@@ -127,9 +175,12 @@ class Product(ImageSourceMixin, models.Model):
     craft = models.CharField(max_length=160, blank=True)
     delivery = models.CharField(max_length=80, blank=True)
     description = models.TextField(blank=True)
+    size_preset = models.CharField(
+        "Size type", max_length=10, choices=SIZE_PRESET_CHOICES, default="custom",
+        help_text="Pick a ready-made list, or choose Custom and type your own sizes in the box below.")
     sizes = models.CharField(
         max_length=120, default="S,M,L,XL",
-        help_text="Comma separated, e.g. 38,40,42,44 or Single,Double,King or Window,Door",
+        help_text="Used when Size type is Custom. Comma separated numbers or letters, e.g. 38,40,42,44 or S,M,L,XL or Single,Double,King",
     )
     image = models.ImageField(
         upload_to="products/", blank=True,
@@ -162,6 +213,8 @@ class Product(ImageSourceMixin, models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)[:130]
+        if self.size_preset in SIZE_PRESETS:
+            self.sizes = SIZE_PRESETS[self.size_preset]
         if self.image and not getattr(self.image, "_committed", True):
             optimise_upload(self.image)
         super().save(*args, **kwargs)
@@ -174,7 +227,9 @@ class HeroSlide(ImageSourceMixin, models.Model):
     eyebrow = models.CharField(max_length=60, blank=True, help_text="Small line above the title, e.g. NEW IN")
     title = models.CharField(max_length=120)
     text = models.CharField(max_length=260, blank=True)
-    image = models.ImageField(upload_to="hero/", blank=True)
+    image = models.ImageField(
+        upload_to="hero/", blank=True,
+        help_text="Best: wide landscape photo, 2400 x 1000 px (keep the subject in the middle/right). It is optimised automatically.")
     image_url = models.URLField(blank=True)
     button_label = models.CharField(max_length=40, default="Shop now")
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL,

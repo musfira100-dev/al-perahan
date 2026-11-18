@@ -78,7 +78,14 @@ class Command(BaseCommand):
         for i, (name, slug, blurb, img) in enumerate(CATEGORIES):
             cats[slug], _ = Category.objects.update_or_create(
                 slug=slug, defaults={"name": name, "blurb": blurb, "image_url": D.format(img), "order": i})
+        for i, name in enumerate(["Summer Suits", "Winter Suits", "Wedding Suits"]):
+            sub, _ = Category.objects.get_or_create(
+                slug="mens-suits-" + name.split()[0].lower(),
+                defaults={"name": name, "parent": cats["mens-suits"], "order": i, "blurb": f"{name} stitched to your measurements."})
+            cats[sub.slug] = sub
         for title, cat, tag, price, fabric, craft, delivery, sizes, img, desc, feat in PRODUCTS:
+            cat = {"Tan Linen Summer Suit": "mens-suits-summer", "Charcoal Wool-Blend Three Piece Suit": "mens-suits-winter",
+                   "Black Formal Tuxedo Set": "mens-suits-wedding"}.get(title, cat)
             Product.objects.update_or_create(
                 title=title,
                 defaults={"category": cats[cat], "tag": tag, "price_pkr": price, "fabric": fabric, "craft": craft,

@@ -36,3 +36,16 @@ python manage.py createsuperuser
 python manage.py runserver -->
 ## Site settings (admin)
 Admin > Site settings: phone, WhatsApp, email, address, Google Maps link, opening hours and social links (Facebook, Instagram, TikTok, YouTube, X). Blank social links are hidden on the site. After pulling this update run `python manage.py migrate`.
+
+## Sub-categories (menu dropdown)
+Admin > Categories: "Parent" khali = main menu category. Parent mein "Men's Suits" chunein to wo sub-category ban jati hai
+(Summer Suits, Winter Suits, Wedding Suits pehle se bani hain). Product add karte waqt Category mein sub-category chunein -
+product Men's Suits mein bhi nazar aata hai. Naya sub-category kabhi bhi add/edit/delete kar sakti hain.
+
+## Sizes
+Admin > Products > "Size type": Letters (S-XXL), Numbers (38-46), Both, Bedding ya Custom. Custom mein apni list likhein: 38,40,42 ya S,M,L.
+
+## Deploy (har update ke baad server par)
+    git pull && source venv/bin/activate && pip install -r requirements.txt
+    python manage.py migrate && python manage.py collectstatic --noinput
+    sudo systemctl restart gunicorn   # service ka naam jo aap ne banaya ho

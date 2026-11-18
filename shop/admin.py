@@ -19,9 +19,20 @@ thumb.short_description = "Photo"
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = (thumb, "name", "order")
+    """Main menu categories and their sub-categories (set 'Parent' to make a sub-category, e.g. Men's Suits > Summer)."""
+    list_display = (thumb, "menu_name", "parent", "order")
+    list_display_links = (thumb, "menu_name")
     list_editable = ("order",)
-    prepopulated_fields = {"slug": ("name",)}
+    list_filter = ("parent",)
+    search_fields = ("name",)
+    fields = ("name", "parent", "blurb", "image", "image_url", "order", "slug")
+
+    @admin.display(description="Name", ordering="name")
+    def menu_name(self, obj):
+        return f"- {obj.name}" if obj.parent_id else obj.name
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("parent")
 
 
 @admin.register(Product)
@@ -31,6 +42,14 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = ("price_pkr", "sale_price", "tag", "is_featured", "is_active")
     search_fields = ("title", "fabric", "craft", "description")
     prepopulated_fields = {"slug": ("title",)}
+    fieldsets = (
+        (None, {"fields": ("title", "slug", "category", "tag", "is_featured", "is_active")}),
+        ("Price", {"fields": ("price_pkr", "sale_price")}),
+        ("Sizes", {"description": "Choose Letters (S, M, L...) or Numbers (38, 40...) - or Custom to type your own list.",
+                   "fields": ("size_preset", "sizes")}),
+        ("Photo", {"fields": ("image", "image_url")}),
+        ("Details", {"fields": ("fabric", "craft", "delivery", "description")}),
+    )
 
 
 @admin.register(Sale)

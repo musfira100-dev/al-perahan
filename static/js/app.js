@@ -24,6 +24,7 @@
   let wish = new Set(store.get('alp.wish', []).filter((id) => byId.has(id)));
   let cat = 'all', query = '', sort = 'featured', qvId = null, qvSize = 'M';
   const SALE = DATA.sale || null;
+  const catLabel = (p) => (p.sub ? `${p.category} \u00b7 ${p.sub}` : p.category);
 
   const fmt = (pkr) => {
     const [rate, sym] = RATES[currency];
@@ -116,7 +117,7 @@
     foot.hidden = false;
     body.innerHTML = cart.map((l, i) => {
       const p = byId.get(l.id);
-      return `<div class="line-item"><div class="media">${imgTag(p, '78px')}</div><div>
+      return `<div class="line-item"><div class="media" data-qv="${p.id}">${imgTag(p, '140px')}</div><div>
         <h4>${esc(p.title)}</h4><small>Size ${esc(l.size)}</small>
         <div class="line-row"><div class="qty"><button type="button" data-qty="${i}" data-d="-1" aria-label="Decrease quantity"><svg class="ic"><use href="#i-minus"/></svg></button><span>${l.qty}</span><button type="button" data-qty="${i}" data-d="1" aria-label="Increase quantity"><svg class="ic"><use href="#i-plus"/></svg></button></div>
         <strong class="price" data-pkr="${p.price * l.qty}"></strong></div>
@@ -142,7 +143,7 @@
     } else {
       body.innerHTML = [...wish].map((id) => {
         const p = byId.get(id);
-        return `<div class="line-item"><div class="media">${imgTag(p, '78px')}</div><div><h4>${esc(p.title)}</h4><small>${esc(p.category)}</small>
+        return `<div class="line-item"><div class="media" data-qv="${p.id}">${imgTag(p, '140px')}</div><div><h4>${esc(p.title)}</h4><small>${esc(catLabel(p))}</small>
           <div class="line-row"><strong class="price" data-pkr="${p.price}"></strong><button class="link" type="button" data-qv="${p.id}">Choose size</button></div>
           <button class="rm" type="button" data-wish="${p.id}"><svg class="ic"><use href="#i-trash"/></svg>Remove</button></div></div>`;
       }).join('');
@@ -175,7 +176,7 @@
     const onSale = products.filter((p) => p.was);
     if (SALE && onSale.length) html += rowHtml('sale', SALE.title, onSale);
     DATA.categories.forEach((c) => {
-      const list = products.filter((p) => p.categorySlug === c.slug);
+      const list = products.filter((p) => p.catSlugs.includes(c.slug));
       if (list.length) html += rowHtml(c.slug, c.name, list);
     });
     const rows = $('#rows'); rows.innerHTML = html;
@@ -184,12 +185,20 @@
 
   function renderChips() {
     const items = [{ slug: 'all', name: 'All pieces' }, ...(SALE ? [{ slug: 'sale', name: 'Sale' }] : []), ...DATA.categories];
-    $('#chips').innerHTML = items.map((c) => `<button class="chip${c.slug === cat ? ' is-active' : ''}" type="button" role="tab" aria-selected="${c.slug === cat}" data-chip="${esc(c.slug)}">${esc(c.name)}</button>`).join('');
+    const top = DATA.categories.find((c) => c.slug === cat || c.children.some((k) => k.slug === cat));
+    const isOn = (c) => c.slug === cat || (top && c.slug === top.slug && c.children && c.children.some((k) => k.slug === cat));
+    const chip = (c, label) => `<button class="chip${isOn(c) || c.slug === cat ? ' is-active' : ''}" type="button" role="tab" aria-selected="${c.slug === cat}" data-chip="${esc(c.slug)}">${esc(label || c.name)}</button>`;
+    $('#chips').innerHTML = items.map((c) => chip(c)).join('');
+    const sub = $('#chips-sub');
+    if (top && top.children.length) {
+      sub.hidden = false;
+      sub.innerHTML = [{ slug: top.slug, name: 'All ' + top.name }, ...top.children].map((c) => chip(c)).join('');
+    } else { sub.hidden = true; sub.innerHTML = ''; }
   }
   function renderGrid() {
     const q = query.trim().toLowerCase();
-    let list = products.filter((p) => (cat === 'all' || (cat === 'sale' ? p.was : p.categorySlug === cat)) &&
-      (!q || [p.title, p.category, p.fabric, p.craft, p.desc, p.tag].join(' ').toLowerCase().includes(q)));
+    let list = products.filter((p) => (cat === 'all' || (cat === 'sale' ? p.was : p.catSlugs.includes(cat))) &&
+      (!q || [p.title, p.category, p.sub, p.fabric, p.craft, p.desc, p.tag].join(' ').toLowerCase().includes(q)));
     if (sort === 'low') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'high') list = [...list].sort((a, b) => b.price - a.price);
     $('#grid').innerHTML = list.map(card).join('');
@@ -217,7 +226,7 @@
     qvId = id; qvSize = sizesOf(p)[0];
     $('#qv-media').classList.remove('is-loaded');
     $('#qv-media').innerHTML = imgTag(p, '(min-width:800px) 480px, 100vw').replace('loading="lazy"', 'loading="eager"');
-    $('#qv-cat').textContent = p.category;
+    $('#qv-cat').textContent = catLabel(p);
     $('#qv-title').textContent = p.title;
     $('#qv-price').innerHTML = p.was ? `<s class="qv-was" data-pkr="${p.was}"></s> <span data-pkr="${p.price}"></span>` : `<span data-pkr="${p.price}"></span>`;
     $('#qv-desc').textContent = p.desc;
@@ -243,10 +252,10 @@
   function renderMega(slug) {
     const c = DATA.categories.find((x) => x.slug === slug); if (!c) return;
     megaCat = slug;
-    const list = products.filter((p) => p.categorySlug === slug).slice(0, 4);
+    const list = products.filter((p) => p.catSlugs.includes(slug)).slice(0, 4);
     megaIn.innerHTML = `
       <ul class="mega-tabs">${DATA.categories.map((k) => `<li><button type="button" data-mega-tab="${esc(k.slug)}" class="${k.slug === slug ? 'is-active' : ''}"><span>${esc(k.name)}</span><small>${k.count} ${k.count === 1 ? 'piece' : 'pieces'}</small></button></li>`).join('')}</ul>
-      <div class="mega-prods">${list.map((p, n) => `<button type="button" class="mp" style="--i:${n}" data-qv="${p.id}"><div class="media">${imgTag(p, '200px')}</div><b>${esc(p.title)}</b>${priceHtml(p)}</button>`).join('')}</div>
+      <div class="mega-mid">${c.children.length ? `<div class="mega-subs"><span>Shop by type</span><a href="#shop" data-cat="${esc(slug)}">All ${esc(c.name)}</a>${c.children.map((k) => `<a href="#shop" data-cat="${esc(k.slug)}">${esc(k.name)}<small>${k.count}</small></a>`).join('')}</div>` : ''}<div class="mega-prods">${list.map((p, n) => `<button type="button" class="mp" style="--i:${n}" data-qv="${p.id}"><div class="media">${imgTag(p, '200px')}</div><b>${esc(p.title)}</b>${priceHtml(p)}</button>`).join('')}</div></div>
       <a class="mega-feature" href="#shop" data-cat="${esc(slug)}"><div class="media">${imgTag(c, '340px', c.name)}</div><div class="mf-body"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><span class="btn btn-gold">Shop all ${ARROW}</span></div></a>`;
     megaIn.classList.remove('swap'); void megaIn.offsetWidth; megaIn.classList.add('swap');
     refreshPrices(); scanImages(megaIn);

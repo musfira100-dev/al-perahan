@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 
 admin.site.site_header = "Al Perahan Collection"
 admin.site.site_title = "Al Perahan Admin"
@@ -12,5 +12,8 @@ urlpatterns = [
     path("", include("shop.urls")),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Uploaded photos (banners, products, categories). Served by Django so they also show when DEBUG is off.
+# (If nginx serves /media/ directly, that is faster and takes priority - this is just the safe fallback.)
+urlpatterns += [
+    re_path(r"^%s(?P<path>.*)$" % settings.MEDIA_URL.lstrip("/"), serve, {"document_root": settings.MEDIA_ROOT}),
+]
